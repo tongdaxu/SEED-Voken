@@ -86,6 +86,30 @@ def sample_classconditional(model, batch_size, class_label, model_type, steps=25
     return log
 
 @torch.no_grad()
+def sample_unconditional(model, batch_size, model_type, steps=256, temperature=None, top_k=None, callback=None,
+                            dim_z=18, h=16, w=16, verbose_time=False, top_p=None, token_factorization=False):
+    log = dict()
+    assert model.be_unconditional, 'Expecting a unconditional Net2NetTransformer.'
+    c_indices = torch.zeros([batch_size, 1]).long().to(model.device)  # class token
+    cond_combined = c_indices
+
+    qzshape = [batch_size, dim_z, h, w]
+    
+    t1 = time.time()
+    index_sample = SAMPLE[model_type](cond_combined, model.transformer, steps=steps,
+                            sample_logits=True, top_k=top_k, callback=callback,
+                            temperature=temperature, top_p=top_p, token_factorization=token_factorization,
+                            cfg_scale=1.0)
+    if verbose_time:
+        sampling_time = time.time() - t1
+        print(f"Full sampling takes about {sampling_time:.2f} seconds.")
+    x_sample = model.decode_to_img(index_sample, qzshape)
+    log["samples"] = x_sample
+    log["class_label"] = c_indices
+    return log
+
+
+@torch.no_grad()
 def run_for_evaluation(logdir, model, batch_size, temperature, top_k, model_type, dim_z, unconditional=True, num_samples=50000,
         given_classes=None, top_p=None, token_factorization=False, cfg_scale=1.0, chunk_id=0):
     batches = [batch_size for _ in range(num_samples//batch_size)] + [num_samples % batch_size]
@@ -97,9 +121,16 @@ def run_for_evaluation(logdir, model, batch_size, temperature, top_k, model_type
     for class_label in tqdm(given_classes, desc="Classes"):
         for n, bs in tqdm(enumerate(batches), desc="Sampling Class"):
             if bs == 0: break
-            logs = sample_classconditional(model, batch_size=bs, class_label=class_label,
-                                            temperature=temperature, top_k=top_k, top_p=top_p, token_factorization=token_factorization
-                                            ,cfg_scale=cfg_scale, dim_z=dim_z, model_type=model_type)
+            if unconditional:
+                logs = sample_unconditional(
+                    model, batch_size=bs,
+                    temperature=temperature, top_k=top_k, top_p=top_p, token_factorization=token_factorization,
+                    dim_z=dim_z, model_type=model_type
+                )
+            else:
+                logs = sample_classconditional(model, batch_size=bs, class_label=class_label,
+                                                temperature=temperature, top_k=top_k, top_p=top_p, token_factorization=token_factorization
+                                                ,cfg_scale=cfg_scale, dim_z=dim_z, model_type=model_type)
             batch_images = save_npz_from_logs(logs, logdir, base_count=n * batch_size)
             images_npz.append(batch_images)
 
@@ -275,7 +306,7 @@ if __name__ == "__main__":
         opt.temperature = [float(temp) for temp in opt.temperature.split(",")][0]
         opt.cfg_scale = [float(cfg_scal) for cfg_scal in opt.cfg_scale.split(",")][0]
 
-    dim_z = config.model.init_args.first_stage_config.params.embed_dim
+    dim_z = 1
 
     chunk_id = opt.chunk_idx
     if opt.classes == "imagenet":

@@ -3,7 +3,7 @@ trainer:
   accelerator: gpu
   strategy: ddp_find_unused_parameters_true
   devices: 8
-  num_nodes: 8
+  num_nodes: 1
   precision: 16-mixed
   max_epochs: 330
   check_val_every_n_epoch: 1
@@ -11,7 +11,7 @@ trainer:
   callbacks:
     - class_path: lightning.pytorch.callbacks.ModelCheckpoint
       init_args:
-        dirpath: "../../checkpoints/vqgan/test"
+        dirpath: "./checkpoints/ibq_d8_t14/test"
         save_top_k: -1
         save_last: True
         monitor: "train/perceptual_loss"
@@ -21,7 +21,7 @@ trainer:
   logger:
     class_path: lightning.pytorch.loggers.TensorBoardLogger
     init_args:
-      save_dir: "../../results/vqgan/"
+      save_dir: "./results/ibq_d8_t14/"
       version: "test"
       name:
 
@@ -35,9 +35,9 @@ model:
       in_channels: 3
       out_ch: 3
       ch: 128
-      ch_mult: [ 1,1,2,2,4]  # num_down = len(ch_mult)-1
+      ch_mult: [ 1,1,2,2]  # num_down = len(ch_mult)-1
       num_res_blocks: 4 #not adopt from showo
-      attn_resolutions: [16] #not adopt from showo
+      attn_resolutions: [32] #not adopt from showo
       dropout: 0.0
 
     lossconfig:
@@ -70,7 +70,7 @@ model:
 data:
   class_path: main.DataModuleFromConfig
   init_args:
-    batch_size: 4
+    batch_size: 16
     num_workers: 16
     train:
       target: src.IBQ.data.imagenet.ImageNetTrain

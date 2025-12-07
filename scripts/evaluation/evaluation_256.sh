@@ -37,7 +37,9 @@
 # python evaluation_image.py --config_file configs/IBQ/gpu/imagenet_ibqgan_16384.yaml --ckpt_path ../upload_ckpts/IBQ/in1k_16384/imagenet256_16384.ckpt --image_size 256 --model IBQ
 
 ## 262144
-# python evaluation_image.py --config_file configs/IBQ/gpu/imagenet_ibqgan_262144.yaml --ckpt_path ../upload_ckpts/IBQ/in1k_262144/imagenet256_262144.ckpt --image_size 256 --model IBQ
+# python evaluation_image.py --config_file configs/IBQ/gpu/imagenet_ibqgan_262144.yaml --ckpt_path /workspace/cogview_dev/xutd/xu/SEED-Voken/bins/imagenet256_262144.ckpt --image_size 256 --model IBQ
+
+python evaluation_image.py --config_file configs/IBQ/gpu/imagenet_ibqgan_262144.yaml --ckpt_path /workspace/cogview_dev/xutd/xu/SEED-Voken/checkpoints/ibq_d16_t18/test/epoch=5-step=80076.ckpt --image_size 256 --model IBQ
 
 ## 8192
 # python evaluation_image.py --config_file configs/IBQ/gpu/imagenet_ibqgan_8192.yaml --ckpt_path ../upload_ckpts/IBQ/in1k_8192/imagenet256_8192.ckpt --image_size 256 --model IBQ

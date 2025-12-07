@@ -7,18 +7,20 @@ CHUNKS=8
 
 for IDX in $(seq 0 $((CHUNKS-1))); do
     CUDA_VISIBLE_DEVICES=$IDX python sample.py \
-        --ckpt "/workspace/cogview_dev/xutd/checkpoints/gq_0.1875/test/epoch=100.ckpt" \
-        --o "/workspace/cogview_dev/xutd/npz/gq_0.1875" \
-        --config "./configs/IBQ/gpu/imagenet_conditional_llama_B_gq_0.1875.yaml" \
+        --ckpt "/workspace/cogview_dev/xutd/checkpoints/bsq_ffhq/test/epoch=299-step=41100.ckpt" \
+        --o "/workspace/cogview_dev/xutd/npz/bsq_ffhq" \
+        --config "./configs/IBQ/gpu/imagenet_conditional_llama_B_bsq_ffhq.yaml" \
         -k 0 \
         -p 1.0 \
         -n 50 \
         -t 1.15 \
         --batch_size 256 \
-        --cfg_scale 4.0 \
+        --cfg_scale 1.0 \
         --model IBQ \
         --global_seed 42 \
         --num_chunks $CHUNKS \
+        --num_samples 8750 \
+        --classes "0" \
         --chunk_idx $IDX &
 done
 
@@ -27,4 +29,4 @@ wait
 echo "combining"
 
 ### logdir format
-python combine_npz.py --logdir /workspace/cogview_dev/xutd/npz/gq_0.1875/samples/top_k_0_temp_1.15_top_p_1.0_cfg_4.0/epoch=100.ckpt
+python combine_npz.py --logdir /workspace/cogview_dev/xutd/npz/bsq_ffhq/samples/top_k_0_temp_1.15_top_p_1.0_cfg_1.0/epoch=299-step=41100.ckpt

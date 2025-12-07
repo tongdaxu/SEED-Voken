@@ -547,6 +547,7 @@ def sample_IBQ(x, model, steps, temperature=1., sample_logits=True,
         cond_token, uncond_token = torch.split(x, bs // 2, dim=0)
         sample = cond_token
     else:
+        cond_token = x
         sample = x
 
     cond_len = x.shape[1]

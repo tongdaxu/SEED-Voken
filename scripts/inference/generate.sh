@@ -42,15 +42,15 @@
 # --cfg_scale 4.0 \
 # --model IBQ
 
-# python generate.py \
-# --ckpt "../upload_ckpts/IBQ/AR_256_XXL/AR_256_XXL.ckpt" \
-# -o "./visualize" \
-# --config "configs/IBQ/gpu/imagenet_conditional_llama_XXL.yaml" \
-# -k 0 \
-# -p 0.96 \
-# -n 8 \
-# -t 1.0 \
-# --classes "207" \
-# --batch_size 8 \
-# --cfg_scale 4.0 \
-# --model IBQ
+CUDA_VISIBLE_DEVICES=1 python generate.py \
+--ckpt "/workspace/cogview_dev/xutd/checkpoints/lfq/test/epoch=100-step=252803.ckpt" \
+-o "./visualize_gq" \
+--config "configs/IBQ/gpu/imagenet_conditional_llama_B_lfq.yaml" \
+-k 0 \
+-p 0.96 \
+-n 8 \
+-t 1.0 \
+--classes "207" \
+--batch_size 8 \
+--cfg_scale 4.0 \
+--model IBQ

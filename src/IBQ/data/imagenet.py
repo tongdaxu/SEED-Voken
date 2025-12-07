@@ -38,6 +38,39 @@ def str_to_indices(string):
     return sorted(indices)
 
 
+class FFHQ128Train(Dataset):
+    def __init__(self, config):
+        self.abspaths = glob.glob("/workspace/cogview_dev/xutd/xu/datasets/ffhq/thumbnails128x128/*.png")
+        self.data = ImagePaths(self.abspaths,
+            labels=None,
+            size=128,
+            random_crop=128,
+            original_reso=False)
+
+    def __len__(self):
+        return len(self.data)
+
+    def __getitem__(self, i):
+        return self.data[i]
+
+
+class FFHQ128Val(Dataset):
+    def __init__(self, config):
+        self.abspaths = glob.glob("/workspace/cogview_dev/xutd/xu/datasets/ffhq/thumbnails128x128/*.png")
+        self.data = ImagePaths(self.abspaths,
+            labels=None,
+            size=128,
+            random_crop=128,
+            original_reso=False)
+
+    def __len__(self):
+        return 5000
+
+    def __getitem__(self, i):
+        return self.data[i]
+
+
+
 class ImageNetBase(Dataset):
     def __init__(self, config=None):
         self.config = config or OmegaConf.create()
@@ -135,8 +168,8 @@ class ImageNetTrain(ImageNetBase):
     def _prepare(self):
         self.random_crop = retrieve(self.config, "ImageNetTrain/random_crop",
                                     default=True)
-        cachedir = os.environ.get("XDG_CACHE_HOME", os.path.expanduser("../data")) #specfy the path
-        self.root = os.path.join(cachedir, self.NAME)
+        # cachedir = os.environ.get("XDG_CACHE_HOME", os.path.expanduser("../data")) #specfy the path
+        self.root = "/workspace/cogview_dev/xutd/xu/datasets/ILSVRC/Data/CLS-LOC/train"
         self.datadir = self.root
         # self.txt_filelist = os.path.join(self.root, "filelist.txt")
 
@@ -199,8 +232,7 @@ class ImageNetValidation(ImageNetBase):
     def _prepare(self):
         self.random_crop = retrieve(self.config, "ImageNetValidation/random_crop",
                                     default=False)
-        cachedir = os.environ.get("XDG_CACHE_HOME", os.path.expanduser("../data")) #specfy the path
-        self.root = os.path.join(cachedir, self.NAME)
+        self.root = "/workspace/cogview_dev/xutd/xu/datasets/ILSVRC/Data/CLS-LOC/val_reorg"
         self.datadir = self.root
         # self.txt_filelist = os.path.join(self.root, "filelist.txt")
 

@@ -261,7 +261,7 @@ if __name__ == "__main__":
         opt.temperature = [float(temp) for temp in opt.temperature.split(",")][0]
         opt.cfg_scale = [float(cfg_scal) for cfg_scal in opt.cfg_scale.split(",")][0]
 
-    dim_z = config.model.init_args.first_stage_config.params.embed_dim
+    dim_z = 1
 
     if opt.classes == "imagenet":
         given_classes = [i for i in range(1000)]
